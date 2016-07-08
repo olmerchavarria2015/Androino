@@ -2,10 +2,12 @@ package com.example.adtjc.arduinocontroller;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Message;
 import android.os.ParcelUuid;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     int superior;
     int pollo;
     Handler mhandler;
+    Handler recHandler;
 
 
     //BroadcastReceiver broadRec;
@@ -46,13 +50,40 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         listView = (ListView)findViewById(R.id.listView1);
         textView2 = (TextView)findViewById(R.id.textView2);
         button1 = (Button)findViewById(R.id.button1);
         editText1 =(EditText)findViewById(R.id.editText1);
         textView1 = (TextView)findViewById(R.id.textView);
-        mhandler = new Handler();
+
+
+
+        mhandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case 99:
+                        Toast.makeText(getApplicationContext()," sucessfully connected",Toast.LENGTH_LONG).show();
+                        break;
+                    case 95:
+                        //ConnectedThread coneccted = new ConnectedThread((BluetoothSocket)msg.obj,this);
+                        byte [] kuduro = (byte[])msg.obj;
+                        //String mensage = kuduro.toString();
+                        Toast.makeText(getApplicationContext(),"message from device: "+ kuduro[0],Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        };
+
+
+
+
+
+
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "no bluetooth capable",Toast.LENGTH_LONG).show();
         }
@@ -77,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                         connectThread.mmSocket.connect();
                         //Toast.makeText(context, "CONNECTED", Toast.LENGTH_LONG).show();
                         connectedThread = new ConnectedThread(connectThread.mmSocket,mhandler);
+                        connectedThread.start();
                     }else {
                         Toast.makeText(context ,"CONNECTION FAILED",Toast.LENGTH_LONG).show();
                     }
@@ -92,10 +124,34 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
+
+
+
     public void sendToDevice(View v){
-        byte[] bytes = new byte []{1,2,3};//editText1.getText().toString().getBytes();
+        byte[] bytes = editText1.getText().toString().getBytes();
         connectedThread.write(bytes);
     }
+
+
+
+
+
+    public void disconnect(View v){
+        try {
+            connectThread.mmSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(context,"Unable to Disconnect",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+
+
+
     public void populateList() {
         if (mBluetoothAdapter.isEnabled()) {
 
@@ -122,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
             btDevices = pairedDevices.toArray();
             BluetoothDevice bTDEVIZ = (BluetoothDevice) btDevices[2];
             ParcelUuid [] parUUS = bTDEVIZ.getUuids();
-            superior = parUUS.length;
-            pollo = 11;
+            //superior = parUUS.length;
+            //pollo = 11;
             //textView2.setText(parUUS[0].toString());
-            Toast.makeText(this, parUUS[0].toString(),Toast.LENGTH_LONG).show();
+           // Toast.makeText(this, parUUS[0].toString(),Toast.LENGTH_LONG).show();
 
             //String UUID = btdevice.getUuid().toString();
 
@@ -134,6 +190,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
+
+
+
+
+
     public BluetoothDevice getDevice(int position){
         try{
             btdevice = (BluetoothDevice) btDevices[position];
@@ -144,12 +207,20 @@ public class MainActivity extends AppCompatActivity {
         }
         return null;
     }
+
+
+
+
+
+
+
     public UUID refinedUUID(BluetoothDevice bTD){
         ParcelUuid[] UUidMero = bTD.getUuids();
         //textView1.setText(UUidMero.length);
         UUID realUUid = UUidMero[0].getUuid();
         return realUUid;
     }
+
 
 
 

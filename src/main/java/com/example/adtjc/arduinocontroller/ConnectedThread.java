@@ -7,15 +7,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.os.Handler;
+import android.os.Message;
 
 public class ConnectedThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
     public Handler mHandler ;
+    MainActivity mainActivity;
+    Message mess ;
 
 
     public ConnectedThread(BluetoothSocket socket,Handler theHandler) {
+        mainActivity = new MainActivity();
         mHandler = theHandler;
         mmSocket = socket;
         InputStream tmpIn = null;
@@ -36,6 +40,7 @@ public class ConnectedThread extends Thread {
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
 
+
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
@@ -43,7 +48,9 @@ public class ConnectedThread extends Thread {
                 bytes = mmInStream.read(buffer);
 
                 // Send the obtained bytes to the UI activity
-               mHandler.obtainMessage(99, bytes, -1, buffer).sendToTarget();
+
+              mHandler.obtainMessage(95, bytes, -1, buffer).sendToTarget();
+
             } catch (IOException e) {
                 break;
             }
@@ -55,6 +62,8 @@ public class ConnectedThread extends Thread {
         try {
             mmOutStream.write(bytes);
         } catch (IOException e) { }
+        mHandler.obtainMessage(99,mmSocket).sendToTarget();
+
     }
 
     /* Call this from the main activity to shutdown the connection */

@@ -48,4 +48,12 @@
         android:layout_gravity="center_horizontal"
         android:onClick="sendToDevice" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Disconect"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal"
+        android:onClick="disconnect" />
+
 </LinearLayout>
