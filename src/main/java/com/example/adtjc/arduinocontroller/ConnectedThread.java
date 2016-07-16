@@ -61,8 +61,12 @@ public class ConnectedThread extends Thread {
     public void write(byte[] bytes) {
         try {
             mmOutStream.write(bytes);
-        } catch (IOException e) { }
-        mHandler.obtainMessage(99,mmSocket).sendToTarget();
+        } catch (IOException e) {
+
+            mHandler.obtainMessage(99,mmSocket).sendToTarget();
+
+        }
+
 
     }
 

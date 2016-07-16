@@ -8,6 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/backgo"
     tools:context="com.example.adtjc.arduinocontroller.MainActivity">
 
     <TextView
@@ -30,21 +31,30 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20sp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="DEVICE"
+        android:textColor="@color/claro"
         android:id="@+id/textView2"
         android:layout_gravity="center_horizontal" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/claro"
+        android:paddingTop="5dp"
+        android:textSize="25sp"
+        android:textStyle="bold"
         android:id="@+id/editText1" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SEND"
+        android:textSize="32sp"
         android:id="@+id/button1"
+        android:layout_marginTop="20sp"
+        android:background="@drawable/ferfetron"
         android:layout_gravity="center_horizontal"
         android:onClick="sendToDevice" />
 
@@ -53,6 +63,8 @@
         android:layout_height="wrap_content"
         android:text="Disconect"
         android:id="@+id/button"
+        android:layout_marginTop="20sp"
+        android:background="@drawable/ferfetron"
         android:layout_gravity="center_horizontal"
         android:onClick="disconnect" />
 

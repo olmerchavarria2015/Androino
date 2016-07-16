@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     ConnectedThread connectedThread;
     int superior;
     int pollo;
-    Handler mhandler;
+    staHandler mhandler;
     Handler recHandler;
 
 
@@ -61,27 +61,7 @@ public class MainActivity extends AppCompatActivity {
         textView1 = (TextView)findViewById(R.id.textView);
 
 
-
-        mhandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what){
-                    case 99:
-                        Toast.makeText(getApplicationContext()," sucessfully connected",Toast.LENGTH_LONG).show();
-                        break;
-                    case 95:
-                        //ConnectedThread coneccted = new ConnectedThread((BluetoothSocket)msg.obj,this);
-                        byte [] kuduro = (byte[])msg.obj;
-                        //String mensage = kuduro.toString();
-                        Toast.makeText(getApplicationContext(),"message from device: "+ kuduro[0],Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        };
-
-
-
-
+        mhandler = new staHandler(context);
 
 
         if (mBluetoothAdapter == null) {
@@ -103,14 +83,15 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     connectThread = new ConnectThread(getDevice(position), refinedUUID(getDevice(position)));
                     //Toast.makeText(context, "CONNECTED", Toast.LENGTH_LONG).show();
-                    textView2.setText(getDevice(position).getName());
+
                     if (!connectThread.mmSocket.isConnected()) {
                         connectThread.mmSocket.connect();
                         //Toast.makeText(context, "CONNECTED", Toast.LENGTH_LONG).show();
-                        connectedThread = new ConnectedThread(connectThread.mmSocket,mhandler);
+                        connectedThread = new ConnectedThread(connectThread.mmSocket, mhandler);
                         connectedThread.start();
-                    }else {
-                        Toast.makeText(context ,"CONNECTION FAILED",Toast.LENGTH_LONG).show();
+                        textView2.setText("CONECTED TO : " + getDevice(position).getName());
+                    } else {
+                        Toast.makeText(context, "CONNECTION FAILED", Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
                     Toast.makeText(context, " DID NOT WORK ", Toast.LENGTH_LONG).show();
@@ -130,8 +111,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void sendToDevice(View v){
-        byte[] bytes = editText1.getText().toString().getBytes();
-        connectedThread.write(bytes);
+        try {
+            byte[] bytes = editText1.getText().toString().getBytes();
+            connectedThread.write(bytes);
+        }catch (Exception e){
+            Toast.makeText(context,"Unable to send : no devices connected",Toast.LENGTH_LONG).show();
+        }
+
     }
 
 
@@ -141,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
     public void disconnect(View v){
         try {
             connectThread.mmSocket.close();
+            textView2.setText("DEVICE");
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(context,"Unable to Disconnect",Toast.LENGTH_SHORT).show();
@@ -174,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             }
-            //mBluetoothAdapter.cancelDiscovery();
+            mBluetoothAdapter.cancelDiscovery();
             btDevices = pairedDevices.toArray();
             BluetoothDevice bTDEVIZ = (BluetoothDevice) btDevices[2];
             ParcelUuid [] parUUS = bTDEVIZ.getUuids();
